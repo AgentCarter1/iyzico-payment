@@ -13,12 +13,12 @@ export class PaymentService {
     });
   }
 
-  async createPayment(): Promise<any> {
+  async createPayment(price: string): Promise<any> {
     const request = {
       locale: Iyzipay.LOCALE.TR,
       conversationId: '123456789',
-      price: '100.00', // Belirlediğin fiyat
-      paidPrice: '100.00',
+      price: price, // Parametre olarak alınan fiyat
+      paidPrice: price,
       currency: Iyzipay.CURRENCY.TRY,
       basketId: 'B67832',
       paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
@@ -57,7 +57,7 @@ export class PaymentService {
           name: 'Product 1',
           category1: 'Category',
           itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
-          price: '100.00',
+          price: price, // Parametre olarak alınan fiyat
         },
       ],
     };
@@ -68,7 +68,6 @@ export class PaymentService {
           console.error('Iyzico Error:', err);
           reject(err);
         } else {
-          //console.log('Iyzico Result:', result); // Yanıtı konsola yazdırarak kontrol edin
           resolve(result);
         }
       });
@@ -89,8 +88,10 @@ export class PaymentService {
           reject(err);
         } else {
           const { status, price } = result;
+
           console.log('Payment Status:', status);
           console.log('Payment Price:', price);
+
           resolve(result);
         }
       });

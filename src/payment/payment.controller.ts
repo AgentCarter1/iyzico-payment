@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Controller, Post, Body, Req, Res } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Request, Response } from 'express'; // Express türlerini içe aktarın
 
@@ -7,10 +7,10 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('/create')
-  async createPayment(@Res() res: Response) {
+  async createPayment(@Body('price') price: string, @Res() res: Response) {
     // Response türünü belirtin
     try {
-      const paymentInit = await this.paymentService.createPayment();
+      const paymentInit = await this.paymentService.createPayment(price);
 
       if (paymentInit.paymentPageUrl) {
         return res.redirect(paymentInit.paymentPageUrl); // Kullanıcıyı Iyzico ödeme sayfasına yönlendir
@@ -27,13 +27,12 @@ export class PaymentController {
   @Post('/callback')
   async paymentCallback(@Req() req: Request, @Res() res: Response) {
     const { token } = req.body; // Token'ı alın
-    //console.log('Payment Callback Token:', token);
 
     try {
       const paymentResult = await this.paymentService.retrievePayment(token);
 
       if (paymentResult.status === 'success') {
-        return res.send('Payment completed successfully!');
+        return res.redirect('http://127.0.0.1:5500/front/index.html');
       } else {
         return res.send('Payment failed or incomplete.');
       }
